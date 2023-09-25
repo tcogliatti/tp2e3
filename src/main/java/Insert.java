@@ -73,7 +73,7 @@ public class Insert {
 
     ///////////////////////////////////////////////////////////     CARGA EQUIPOS
     public static void cargaDeEquipos() {
-        ArrayList<Jugador> jugadores = new ArrayList<>();
+        List<Jugador> jugadores = new ArrayList<>();
         ArrayList<String> nombres = obtenerNombre();
         ArrayList<Persona> personas = Select.obtenerTodasLasPErsonas();
         Jugador j;
@@ -97,51 +97,56 @@ public class Insert {
             if (nombreOsponsor == 1)
                 e.setSponsor(obtenerNombreRandom(nombres));
             else
-                e.setNombre(null);
+                e.setSponsor(null);
 
             // set DT
-            int indexPersona = getRandomEntreDosValores(1, personas.size()) - 1;
-            p = em.find(Persona.class, indexPersona);
-            e.setDt(p);
+            e.setDt(getPersonaRandom(personas));
 
             for (int ii = 0; ii < tamanioEquipo; ii++) {
-                // seleccionar Persona
-                indexPersona = getRandomEntreDosValores(1, personas.size()) - 1;
-                j = new Jugador(em.find(Persona.class, indexPersona));
-
+                p = getPersonaRandom(personas);
+                j =  new Jugador();
                 // set equipo
-                if (jugadores.size() == 0) {
+                if (e.getEquipo().size() == 0) {
                     j.setPosicion("arquero");
+                    e.addJugador(j);
+                    em.persist(j);
                 } else {
                     int cantDefensa = getRandomEntreDosValores(1, 4);
                     for (int k = 0; k < cantDefensa; k++) {
-                        j = new Jugador(em.find(Persona.class, indexPersona));
                         j.setPosicion(posiciones.get(2));
                         e.addJugador(j);
+                        em.persist(j);
                     }
                     int cantMedioca = getRandomEntreDosValores(1, (6 - cantDefensa - 1));
                     for (int k = 0; k < cantMedioca; k++) {
-                        j = new Jugador(em.find(Persona.class, indexPersona));
                         j.setPosicion(posiciones.get(3));
                         e.addJugador(j);
+                        em.persist(j);
                     }
                     int cantDelante = 6 - cantDefensa - cantMedioca;
                     for (int k = 0; k < cantDelante; k++) {
-                        j = new Jugador(em.find(Persona.class, indexPersona));
                         j.setPosicion(posiciones.get(4));
                         e.addJugador(j);
+                        em.persist(j);
                     }
                     int cantSuplent = getRandomEntreDosValores(0, 3);
                     for (int k = 0; k < cantSuplent; k++) {
-                        j = new Jugador(em.find(Persona.class, indexPersona));
                         j.setPosicion(posiciones.get(getRandomEntreDosValores(1, 4)));
                         e.addJugador(j);
+                        em.persist(j);
                     }
                 }
+                em.persist(e);
             }
         }
     }
 
+    public static Persona getPersonaRandom(ArrayList<Persona> personas){
+        int index = getRandomEntreDosValores(0, personas.size());
+        Persona p = personas.get(index);
+        personas.remove(index);
+        return p;
+    }
     public static String obtenerNombreRandom(ArrayList<String> nombresList) {
         int nombreIndexRandom = getRandomEntreDosValores(0, nombresList.size() - 1);
         String nombre = nombresList.get(nombreIndexRandom);

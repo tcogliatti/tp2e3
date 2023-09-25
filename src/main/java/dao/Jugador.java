@@ -2,6 +2,7 @@ package dao;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import java.util.Date;
 
@@ -9,9 +10,11 @@ import java.util.Date;
 @DiscriminatorValue("jugador")
 public class Jugador extends Persona {
     private String posicion;
-    @OneToOne
+    @ManyToOne
     private Equipo equipo;
+    public Jugador() {
 
+    }
     public Jugador(Persona p){
         super(p.getNombre(), p.getMail(), p.getNacimiento());
         posicion = null;
@@ -27,7 +30,6 @@ public class Jugador extends Persona {
         this.posicion = posicion;
         this.equipo = equipo;
     }
-
     public String getPosicion() {
         return posicion;
     }

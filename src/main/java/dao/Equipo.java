@@ -12,9 +12,8 @@ public class Equipo {
     private int idEquipo;
     @ManyToOne
     private Persona dt;
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "equipo")
-
-    private ArrayList<Jugador> equipo;
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "equipo")
+    private List<Jugador> equipo;
     @Column(nullable = true)
     private String nombre;
     @Column(nullable = true)
@@ -24,54 +23,42 @@ public class Equipo {
     public static final int MINIMO_JUGADORES = 7;
 
     public Equipo() {
-        this.equipo = new ArrayList<Jugador>();
+        this.equipo = new ArrayList<>();
     }
-    public Equipo(Persona dt, ArrayList<Jugador> equipo, String sponsor, String nombre) {
+    public Equipo(Persona dt, List<Jugador> equipo, String sponsor, String nombre) {
         this.dt = dt;
         this.equipo = equipo;
         this.sponsor = sponsor;
         this.nombre = nombre;
     }
-
     public int getIdEquipo() {
         return idEquipo;
     }
     public void addJugador(Jugador j){
+        j.setEquipo(this);
         equipo.add(j);
     }
-
-    public void setIdEquipo(int idEquipo) {
-        this.idEquipo = idEquipo;
-    }
-
     public Persona getDt() {
         return dt;
     }
-
     public void setDt(Persona dt) {
         this.dt = dt;
     }
-
-    public ArrayList<Jugador> getEquipo() {
+    public List<Jugador> getEquipo() {
         return equipo;
     }
-
-    public void setEquipo(ArrayList<Jugador> equipo) {
+    public void setEquipo(List<Jugador> equipo) {
         this.equipo = equipo;
     }
-
     public String getSponsor() {
         return sponsor;
     }
-
     public void setSponsor(String sponsor) {
         this.sponsor = sponsor;
     }
-
     public String getNombre() {
         return nombre;
     }
-
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
