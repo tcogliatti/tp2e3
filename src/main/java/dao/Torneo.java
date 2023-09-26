@@ -1,6 +1,7 @@
 package dao;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -16,6 +17,8 @@ public class Torneo {
     private List<Equipo> equipos;
 
     public Torneo() {
+        this.cupo = 0;
+        this.equipos = new ArrayList<>();
     }
 
     public Torneo(String nombre, int cupo, List<Equipo> equipos) {
@@ -54,5 +57,9 @@ public class Torneo {
 
     public void setEquipos(List<Equipo> equipos) {
         this.equipos = equipos;
+    }
+    public void addEquipo(Equipo e){
+        if(this.cupo > this.equipos.size())
+            equipos.add(e);
     }
 }

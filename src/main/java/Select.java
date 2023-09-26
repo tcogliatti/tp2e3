@@ -1,3 +1,4 @@
+import dao.Equipo;
 import dao.Persona;
 
 import javax.persistence.EntityManager;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Select {
-    protected final static String PERSISTENCE = "tp2e3";
+    protected final static String PERSISTENCE = "tp2e3_2";
     protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE);
     protected static EntityManager em = emf.createEntityManager();
     public static void main(String[] args) {
@@ -18,5 +19,10 @@ public class Select {
         Query personaQuery = em.createNamedQuery(Persona.OBTENER_TODOS);
         List<Persona> personaList = personaQuery.getResultList();
         return new ArrayList<>(personaList);
+    }
+    public static ArrayList<Equipo> obtenerTodasLosEquipos(){
+        Query equipoQuery = em.createNamedQuery(Equipo.OBTENER_TODOS);
+        List<Equipo> equipoList = equipoQuery.getResultList();
+        return new ArrayList<>(equipoList);
     }
 }

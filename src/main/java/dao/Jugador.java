@@ -1,35 +1,33 @@
 package dao;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import java.util.Date;
+import javax.persistence.*;
 
 @Entity
-@DiscriminatorValue("jugador")
-public class Jugador extends Persona {
+@NamedQuery(name = Jugador.OBTENER_TODOS, query = "select j from Jugador j")
+public class Jugador {
+    @Id
+    private int id;
+    @OneToOne(cascade = CascadeType.ALL)
+    @MapsId
+    private Persona persona;
+    @Column
     private String posicion;
     @ManyToOne
     private Equipo equipo;
+    public static final String OBTENER_TODOS = "Jugador.obtenerTodos";
+
     public Jugador() {
-
     }
-    public Jugador(Persona p){
-        super(p.getNombre(), p.getMail(), p.getNacimiento());
-        posicion = null;
-        equipo = null;
-    }
-    public Jugador(String posicion, Equipo equipo) {
-        this.posicion = posicion;
-        this.equipo = equipo;
+    public Jugador(Persona per) {
+        this.persona = per;
     }
 
-    public Jugador(String nombre, String mail, Date nacimiento, String posicion, Equipo equipo) {
-        super(nombre, mail, nacimiento);
-        this.posicion = posicion;
-        this.equipo = equipo;
+    public Jugador(Persona per, String pos, Equipo equi) {
+        this.persona = per;
+        this.posicion = pos;
+        this.equipo = equi;
     }
+
     public String getPosicion() {
         return posicion;
     }
@@ -49,10 +47,7 @@ public class Jugador extends Persona {
     @Override
     public String toString() {
         return "Jugador{" +
-                "idPersona=" + idPersona +
-                ", nombre='" + nombre + '\'' +
-                ", mail='" + mail + '\'' +
-                ", nacimiento=" + nacimiento +
+                this.persona +
                 "posicion='" + posicion + '\'' +
                 ", equipo=" + equipo +
                 '}';

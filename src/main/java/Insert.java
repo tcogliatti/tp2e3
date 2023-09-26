@@ -1,6 +1,7 @@
 import dao.Equipo;
 import dao.Jugador;
 import dao.Persona;
+import dao.Torneo;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -18,22 +19,28 @@ public class Insert {
     private static final String TORNEOS_FILE = "torneos.csv";
     private static final String EQUIPOS_FILE = "equipos.csv";
     private static final String POSICIONES_FILE = "posiciones.csv";
-    private static final int CANTIDAD_DE_EQUIPOS = 9;
+    private static final int CANTIDAD_DE_EQUIPOS = 10;
     private static final int ANIO_INICIAL = 1982;
     private static final int ANIO_FINAL = 2005;
-    protected final static String PERSISTENCE = "tp2e3";
+    public static final int CANTIDAD_DE_TORNEOS = 6;
+    protected final static String PERSISTENCE = "tp2e3_2";
     protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE);
     protected static EntityManager em = emf.createEntityManager();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) { ///////////////////////     MAIN      /////////////////////
+
         // coneccion
         em.getTransaction().begin();
 
         // carga de Personas
 //        cargarPersonas();
+//        em.getTransaction().commit();
 
         // carga de equipos
-        cargaDeEquipos();
+//        cargaDeEquipos();
+
+        // carga de Torneos
+        cargaDeTorneos();
         // enviando la transacción
         em.getTransaction().commit();
 
@@ -64,16 +71,15 @@ public class Insert {
 
     public static Date obtenerNacimientoAleatoreo() {
         Random random = new Random();
-        int añoAleatorio = random.nextInt(ANIO_FINAL - ANIO_INICIAL + 1) + ANIO_INICIAL;
+        int anioAleatorio = random.nextInt(ANIO_FINAL - ANIO_INICIAL + 1) + ANIO_INICIAL;
         int mesAleatorio = random.nextInt(12);
         int diaAleatorio = random.nextInt(28) + 1;
-        Calendar fechaAleatoria = new GregorianCalendar(añoAleatorio, mesAleatorio, diaAleatorio);
+        Calendar fechaAleatoria = new GregorianCalendar(anioAleatorio, mesAleatorio, diaAleatorio);
         return fechaAleatoria.getTime();
     }
 
     ///////////////////////////////////////////////////////////     CARGA EQUIPOS
     public static void cargaDeEquipos() {
-        List<Jugador> jugadores = new ArrayList<>();
         ArrayList<String> nombres = obtenerNombre();
         ArrayList<Persona> personas = Select.obtenerTodasLasPErsonas();
         Jugador j;
@@ -86,7 +92,7 @@ public class Insert {
         posiciones.put(4, "delantera");
 
         for (int i = 0; i < CANTIDAD_DE_EQUIPOS; i++) {
-            int tamanioEquipo = getRandomEntreDosValores(Equipo.MINIMO_JUGADORES, Equipo.MAXIMO_JUGADORES);
+            // nuevo equipo
             e = new Equipo();
 
             // set nombre
@@ -102,61 +108,67 @@ public class Insert {
             // set DT
             e.setDt(getPersonaRandom(personas));
 
-            for (int ii = 0; ii < tamanioEquipo; ii++) {
+            // persistiendo el equipo antes de cargar los jugadores
+            em.persist(e);
+
+            // armado de equipo seteando jugadores y sus posiciones
+            // arquero
+            p = getPersonaRandom(personas);
+            j = new Jugador(p);
+            j.setPosicion("arquero");
+            j.setEquipo(e);
+            em.merge(j);
+            // defensa
+            int cantDefensa = getRandomEntreDosValores(1, 4);
+            for (int k = 0; k < cantDefensa; k++) {
                 p = getPersonaRandom(personas);
-                j =  new Jugador();
-                // set equipo
-                if (e.getEquipo().size() == 0) {
-                    j.setPosicion("arquero");
-                    e.addJugador(j);
-                    em.persist(j);
-                } else {
-                    int cantDefensa = getRandomEntreDosValores(1, 4);
-                    for (int k = 0; k < cantDefensa; k++) {
-                        j.setPosicion(posiciones.get(2));
-                        e.addJugador(j);
-                        em.persist(j);
-                    }
-                    int cantMedioca = getRandomEntreDosValores(1, (6 - cantDefensa - 1));
-                    for (int k = 0; k < cantMedioca; k++) {
-                        j.setPosicion(posiciones.get(3));
-                        e.addJugador(j);
-                        em.persist(j);
-                    }
-                    int cantDelante = 6 - cantDefensa - cantMedioca;
-                    for (int k = 0; k < cantDelante; k++) {
-                        j.setPosicion(posiciones.get(4));
-                        e.addJugador(j);
-                        em.persist(j);
-                    }
-                    int cantSuplent = getRandomEntreDosValores(0, 3);
-                    for (int k = 0; k < cantSuplent; k++) {
-                        j.setPosicion(posiciones.get(getRandomEntreDosValores(1, 4)));
-                        e.addJugador(j);
-                        em.persist(j);
-                    }
-                }
-                em.persist(e);
+                j = new Jugador(p);
+                j.setPosicion(posiciones.get(2));
+                j.setEquipo(e);
+                em.merge(j);
+            }
+            // medicompo
+            int cantMedioca = getRandomEntreDosValores(1, (6 - cantDefensa - 1));
+            for (int k = 0; k < cantMedioca; k++) {
+                p = getPersonaRandom(personas);
+                j = new Jugador(p);
+                j.setPosicion(posiciones.get(3));
+                j.setEquipo(e);
+                em.merge(j);
+            }
+            //delantera
+            int cantDelante = 6 - cantDefensa - cantMedioca;
+            for (int k = 0; k < cantDelante; k++) {
+                p = getPersonaRandom(personas);
+                j = new Jugador(p);
+                j.setPosicion(posiciones.get(4));
+                j.setEquipo(e);
+                em.merge(j);
+            }
+            //suplentes
+            int cantSuplent = getRandomEntreDosValores(0, 3);
+            for (int k = 0; k < cantSuplent; k++) {
+                p = getPersonaRandom(personas);
+                j = new Jugador(p);
+                j.setPosicion(posiciones.get(getRandomEntreDosValores(1, 4)));
+                j.setEquipo(e);
+                em.merge(j);
             }
         }
     }
 
-    public static Persona getPersonaRandom(ArrayList<Persona> personas){
-        int index = getRandomEntreDosValores(0, personas.size());
+    public static Persona getPersonaRandom(ArrayList<Persona> personas) {
+        int index = getRandomEntreDosValores(0, personas.size() - 1);
         Persona p = personas.get(index);
         personas.remove(index);
         return p;
     }
+
     public static String obtenerNombreRandom(ArrayList<String> nombresList) {
         int nombreIndexRandom = getRandomEntreDosValores(0, nombresList.size() - 1);
         String nombre = nombresList.get(nombreIndexRandom);
         nombresList.remove(nombreIndexRandom);
         return nombre;
-    }
-
-    public static int getRandomEntreDosValores(int a, int b) {
-        Random random = new Random();
-        return random.nextInt(b - a + 1) + a;
     }
 
     public static ArrayList<String> obtenerNombre() {
@@ -172,5 +184,45 @@ public class Insert {
         }
         return nombres;
     }
+
+    ///////////////////////////////////////////////////////////     CARGA TORNEOS
+
+    public static void cargaDeTorneos(){
+        ArrayList<String> nombres = obtenerNombre();
+        ArrayList<Equipo> equipos = Select.obtenerTodasLosEquipos();
+        Torneo torneo;
+        HashMap<Integer, Integer> cupo = new HashMap<>();
+        cupo.put(1,6);
+        cupo.put(2,8);
+        cupo.put(3,10);
+        /*
+        * Por iteración (definir cantidad de torneos)
+        * 1- obtener nombre
+        * 2- obtener cantidad aleatorea de equipos, 4, 6, 8
+        * 3- obtener aleatoreamente los equipos participantes
+        * */
+        for (int i = 0; i < CANTIDAD_DE_TORNEOS ; i++) {
+            ArrayList<Equipo> candidatos = new ArrayList<>(equipos);
+            torneo = new Torneo();
+            torneo.setNombre(obtenerNombreRandom(nombres));
+            torneo.setCupo(cupo.get(getRandomEntreDosValores(1,3)));
+
+            for (int j = 0; j < torneo.getCupo(); j++) {
+                int index = getRandomEntreDosValores(0,candidatos.size()-1);
+                Equipo e = candidatos.get(index);
+                candidatos.remove(index);
+                torneo.addEquipo(e);
+            }
+            em.persist(torneo);
+        }
+    }
+
+    ///////////////////////////////////////////////////////////     Generales
+
+    public static int getRandomEntreDosValores(int a, int b) {
+        Random random = new Random();
+        return random.nextInt(b - a + 1) + a;
+    }
+
 
 }
