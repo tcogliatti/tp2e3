@@ -1,39 +1,11 @@
-nombre
-La Peste Naranja
-Tiburones
-El Barza
-Los Patadura
-Tormenta FC
-Rayos de la Ciudad
-Los Relámpagos
-Los Ángeles de Fútbol
-Los Guerreros
-El Equipo del Pueblo
-Los Fantasmas del Estadio
-El Club Atlético
-Los Rojos del Sur
-Los Galácticos
-Guerreros del Fuego
-Azules de la Costa
-Caballeros de la Cancha
-Los Monarcas
-Rojos del Pueblo
-Estrellas del Fútbol
-Rayos del Norte
-Titanes del Norte
-El Club Deportivo
-Los Soles Radiantes
-Los Gigantes del Norte
-Las Estrellas del Sur
-Los Gigantes del Este
-Rayos de Sol
-Los Chirimbolos FC
-Los Cebolletas United
-Los Frikis del Gol
-Los Descoordinados FC
-Los Gambeteadores de la Comedia
-Los Tronchantes del Balón
-Los Tocapelotas United
-Los Pelotazos al Aire FC
-Los Despelotados de la Cancha
-Los Patosos del Gol
+idEquipo,nombre,sponsor,dt_idPersona
+105,Tormenta FC,Pañalera El Baby,168
+106,Los Gigantes del Este,,146
+107,Las Estrellas del Sur,Optica El Ojo Loco,122
+108,El Barza,,116
+109,Los Descoordinados FC,,119
+110,Los Paraliticos del Docke,,165
+111,Los Patosos del Gol,Supermercados El Piti,105
+112,Los Monarcas,Heladeria El Show Del Helado,155
+113,Rojos del Pueblo,,112
+114,Los Rojos del Sur,Carnicerías El Chori,189

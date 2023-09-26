@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Select {
-    protected final static String PERSISTENCE = "tp2e3_2";
+    protected final static String PERSISTENCE = "tp2e3_test";
     protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE);
     protected static EntityManager em = emf.createEntityManager();
     public static void main(String[] args) {

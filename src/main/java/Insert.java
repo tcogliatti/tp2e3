@@ -11,6 +11,8 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Insert {
@@ -18,211 +20,197 @@ public class Insert {
     private static final String PERSONAS_FILE = "personas.csv";
     private static final String TORNEOS_FILE = "torneos.csv";
     private static final String EQUIPOS_FILE = "equipos.csv";
-    private static final String POSICIONES_FILE = "posiciones.csv";
-    private static final int CANTIDAD_DE_EQUIPOS = 10;
-    private static final int ANIO_INICIAL = 1982;
-    private static final int ANIO_FINAL = 2005;
-    public static final int CANTIDAD_DE_TORNEOS = 6;
-    protected final static String PERSISTENCE = "tp2e3_2";
+    private static final String TORNEO_EQUIPO_FILE = "torneo_equipo.csv";
+    private static final String JUGADOR_FILE = "jugador.csv";
+    protected final static String PERSISTENCE = "tp2e3_test";
     protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE);
     protected static EntityManager em = emf.createEntityManager();
 
     public static void main(String[] args) { ///////////////////////     MAIN      /////////////////////
 
-        // coneccion
-        em.getTransaction().begin();
+//        try {
+//            // coneccion
+//            em.getTransaction().begin();
+//
+//            // carga de Personas
+//            cargarPersonas();
+//
+//            // carga de equipos
+//            cargaDeEquipos();
+//
+//            // ejecutar transacción
+//            em.getTransaction().commit();
+//
+//        } catch (Exception e) {
+//            em.getTransaction().rollback();
+//            e.printStackTrace();
+//            return;
+//        }
 
-        // carga de Personas
-//        cargarPersonas();
-//        em.getTransaction().commit();
+        try {
+            // coneccion
+            em.getTransaction().begin();
 
-        // carga de equipos
-//        cargaDeEquipos();
+            // carga de jugadores
+            cargaDeJugadores();
 
-        // carga de Torneos
-        cargaDeTorneos();
-        // enviando la transacción
-        em.getTransaction().commit();
+            // carga de Torneos
+            cargaDeTorneos();
 
-        // cierre
-        em.close();
-        emf.close();
+            // ejecutar transacción
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            e.printStackTrace();
+            return;
+        }
+
+        try {
+            // coneccion
+            em.getTransaction().begin();
+
+            // carga de equipos a torneos
+            cargaDeEquiposAtorneos();
+
+            // ejecutar transacción
+            em.getTransaction().commit();
+
+        } catch (Exception e) {
+            em.getTransaction().rollback();
+            e.printStackTrace();
+            return;
+        } finally {
+            // cierre
+            em.close();
+            emf.close();
+        }
     }
 
     ///////////////////////////////////////////////////////////     CARGA PERSONAS
     public static void cargarPersonas() {
-        Persona per = null;
-        CSVParser parser = null;
+        Persona per;
+        CSVParser parser;
+
+        // carga CSV
         try {
             parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + PERSONAS_FILE));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.print("Cargando Personas --> ");
+        System.out.println("Cargando Personas --> ");
         for (CSVRecord row : parser) {
-            Date nacimiento = obtenerNacimientoAleatoreo();
-            per = new Persona(row.get("nombre"), row.get("email"), nacimiento);
-            System.out.println(per);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date nacimiento = null;
+            try {
+                nacimiento = sdf.parse(row.get("nacimiento"));
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
+            }
+//            Date nacimiento = new Date(row.get("nacimiento"));
+            per = new Persona(Integer.parseInt(row.get("idPersona")), row.get("nombre"), row.get("mail"), nacimiento);
+            System.out.println("\t"+per);
             em.persist(per);
-            System.out.print(".");
         }
         System.out.println("\n                  --> proceso terminado /_");
     }
 
-    public static Date obtenerNacimientoAleatoreo() {
-        Random random = new Random();
-        int anioAleatorio = random.nextInt(ANIO_FINAL - ANIO_INICIAL + 1) + ANIO_INICIAL;
-        int mesAleatorio = random.nextInt(12);
-        int diaAleatorio = random.nextInt(28) + 1;
-        Calendar fechaAleatoria = new GregorianCalendar(anioAleatorio, mesAleatorio, diaAleatorio);
-        return fechaAleatoria.getTime();
-    }
-
     ///////////////////////////////////////////////////////////     CARGA EQUIPOS
     public static void cargaDeEquipos() {
-        ArrayList<String> nombres = obtenerNombre();
-        ArrayList<Persona> personas = Select.obtenerTodasLasPErsonas();
-        Jugador j;
-        Equipo e;
-        Persona p;
-        Map<Integer, String> posiciones = new HashMap<>();
-        posiciones.put(1, "arquero");
-        posiciones.put(2, "defensa");
-        posiciones.put(3, "medicampo");
-        posiciones.put(4, "delantera");
+        Equipo equipo;
+        Persona persona;
+        CSVParser parser;
 
-        for (int i = 0; i < CANTIDAD_DE_EQUIPOS; i++) {
-            // nuevo equipo
-            e = new Equipo();
-
-            // set nombre
-            e.setNombre(obtenerNombreRandom(nombres));
-
-            // determinar si lleva nombre de equipo o de sponsor
-            int nombreOsponsor = getRandomEntreDosValores(0, 1);
-            if (nombreOsponsor == 1)
-                e.setSponsor(obtenerNombreRandom(nombres));
-            else
-                e.setSponsor(null);
-
-            // set DT
-            e.setDt(getPersonaRandom(personas));
-
-            // persistiendo el equipo antes de cargar los jugadores
-            em.persist(e);
-
-            // armado de equipo seteando jugadores y sus posiciones
-            // arquero
-            p = getPersonaRandom(personas);
-            j = new Jugador(p);
-            j.setPosicion("arquero");
-            j.setEquipo(e);
-            em.merge(j);
-            // defensa
-            int cantDefensa = getRandomEntreDosValores(1, 4);
-            for (int k = 0; k < cantDefensa; k++) {
-                p = getPersonaRandom(personas);
-                j = new Jugador(p);
-                j.setPosicion(posiciones.get(2));
-                j.setEquipo(e);
-                em.merge(j);
-            }
-            // medicompo
-            int cantMedioca = getRandomEntreDosValores(1, (6 - cantDefensa - 1));
-            for (int k = 0; k < cantMedioca; k++) {
-                p = getPersonaRandom(personas);
-                j = new Jugador(p);
-                j.setPosicion(posiciones.get(3));
-                j.setEquipo(e);
-                em.merge(j);
-            }
-            //delantera
-            int cantDelante = 6 - cantDefensa - cantMedioca;
-            for (int k = 0; k < cantDelante; k++) {
-                p = getPersonaRandom(personas);
-                j = new Jugador(p);
-                j.setPosicion(posiciones.get(4));
-                j.setEquipo(e);
-                em.merge(j);
-            }
-            //suplentes
-            int cantSuplent = getRandomEntreDosValores(0, 3);
-            for (int k = 0; k < cantSuplent; k++) {
-                p = getPersonaRandom(personas);
-                j = new Jugador(p);
-                j.setPosicion(posiciones.get(getRandomEntreDosValores(1, 4)));
-                j.setEquipo(e);
-                em.merge(j);
-            }
-        }
-    }
-
-    public static Persona getPersonaRandom(ArrayList<Persona> personas) {
-        int index = getRandomEntreDosValores(0, personas.size() - 1);
-        Persona p = personas.get(index);
-        personas.remove(index);
-        return p;
-    }
-
-    public static String obtenerNombreRandom(ArrayList<String> nombresList) {
-        int nombreIndexRandom = getRandomEntreDosValores(0, nombresList.size() - 1);
-        String nombre = nombresList.get(nombreIndexRandom);
-        nombresList.remove(nombreIndexRandom);
-        return nombre;
-    }
-
-    public static ArrayList<String> obtenerNombre() {
-        CSVParser parser = null;
-        ArrayList<String> nombres = new ArrayList<>();
+        // carga CSV
         try {
             parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + EQUIPOS_FILE));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        System.out.println("Cargando Equipos --> ");
         for (CSVRecord row : parser) {
-            nombres.add(row.get("nombre"));
+            persona = em.find(Persona.class, Integer.parseInt(row.get("dt_idPersona")));
+            equipo = new Equipo(Integer.parseInt(row.get("idEquipo")), persona, row.get("nombre"), row.get("sponsor"));
+            System.out.println("\t"+equipo);
+            em.persist(equipo);
         }
-        return nombres;
+        System.out.println("\n                  --> proceso terminado /_");
+    }
+
+    ///////////////////////////////////////////////////////////     CARGA JUGADORES
+    public static void cargaDeJugadores() {
+        Equipo equipo;
+        Persona persona;
+        Jugador jugador;
+        CSVParser parser;
+
+        // carga CSV
+        try {
+            parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + JUGADOR_FILE));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Cargando Jugadores --> ");
+        for (CSVRecord row : parser) {
+            persona = em.find(Persona.class, Integer.parseInt(row.get("persona_idPersona")));
+            equipo = em.find(Equipo.class, Integer.parseInt(row.get("equipo_idEquipo")));
+            jugador = new Jugador(persona, row.get("posicion"), equipo);
+            System.out.println("\t"+jugador);
+            em.persist(jugador);
+        }
+        System.out.println("\n                  --> proceso terminado /_");
     }
 
     ///////////////////////////////////////////////////////////     CARGA TORNEOS
 
     public static void cargaDeTorneos(){
-        ArrayList<String> nombres = obtenerNombre();
-        ArrayList<Equipo> equipos = Select.obtenerTodasLosEquipos();
         Torneo torneo;
-        HashMap<Integer, Integer> cupo = new HashMap<>();
-        cupo.put(1,6);
-        cupo.put(2,8);
-        cupo.put(3,10);
-        /*
-        * Por iteración (definir cantidad de torneos)
-        * 1- obtener nombre
-        * 2- obtener cantidad aleatorea de equipos, 4, 6, 8
-        * 3- obtener aleatoreamente los equipos participantes
-        * */
-        for (int i = 0; i < CANTIDAD_DE_TORNEOS ; i++) {
-            ArrayList<Equipo> candidatos = new ArrayList<>(equipos);
-            torneo = new Torneo();
-            torneo.setNombre(obtenerNombreRandom(nombres));
-            torneo.setCupo(cupo.get(getRandomEntreDosValores(1,3)));
+        CSVParser parser;
 
-            for (int j = 0; j < torneo.getCupo(); j++) {
-                int index = getRandomEntreDosValores(0,candidatos.size()-1);
-                Equipo e = candidatos.get(index);
-                candidatos.remove(index);
-                torneo.addEquipo(e);
-            }
+        // carga CSV
+        try {
+            parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + TORNEOS_FILE));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Cargando Torneos --> ");
+        for (CSVRecord row : parser) {
+            torneo = new Torneo(Integer.parseInt(row.get("idTorneo")), row.get("nombre"), Integer.parseInt(row.get("cupo")));
+            System.out.println("\t"+torneo);
             em.persist(torneo);
         }
+        System.out.println("\n                  --> proceso terminado /_");
     }
 
-    ///////////////////////////////////////////////////////////     Generales
+    ///////////////////////////////////////////////////////////     CARGA EQUIPOS A TORNEOS
+    public static void cargaDeEquiposAtorneos(){
+        Torneo torneo = new Torneo();
+        Equipo equipo;
+        CSVParser parser;
 
-    public static int getRandomEntreDosValores(int a, int b) {
-        Random random = new Random();
-        return random.nextInt(b - a + 1) + a;
+        // carga CSV
+        try {
+            parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + TORNEO_EQUIPO_FILE));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        System.out.println("Cargando Equipos a Torneos --> ");
+        Integer idTorneo = null;
+        Integer prevIdTorneo = null;
+        for (CSVRecord row : parser) {
+            idTorneo = Integer.parseInt(row.get("Torneo_idTorneo"));
+            if(!idTorneo.equals(prevIdTorneo) || idTorneo.equals(null)){
+                torneo = em.find(Torneo.class, idTorneo);
+                prevIdTorneo = idTorneo;
+            }
+            equipo = em.find(Equipo.class, Integer.parseInt(row.get("equipos_idEquipo")));
+            torneo.addEquipo(equipo);
+            System.out.println("\t.");
+        }
+        System.out.println("\n                  --> proceso terminado /_");
     }
-
-
 }

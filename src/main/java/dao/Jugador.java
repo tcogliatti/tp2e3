@@ -27,7 +27,12 @@ public class Jugador {
         this.posicion = pos;
         this.equipo = equi;
     }
-
+    public Jugador(int id, Persona persona, String posicion, Equipo equipo) {
+        this.id = id;
+        this.persona = persona;
+        this.posicion = posicion;
+        this.equipo = equipo;
+    }
     public String getPosicion() {
         return posicion;
     }

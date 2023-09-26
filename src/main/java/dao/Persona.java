@@ -7,7 +7,6 @@ import java.util.Date;
 @NamedQuery(name = Persona.OBTENER_TODOS, query = "SELECT p FROM Persona p")
 public class Persona {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int idPersona;
     @Column(nullable = false)
     private String nombre;
@@ -23,6 +22,13 @@ public class Persona {
     }
 
     public Persona(String nombre, String mail, Date nacimiento) {
+        this.nombre = nombre;
+        this.mail = mail;
+        this.nacimiento = nacimiento;
+    }
+
+    public Persona(int idPersona, String nombre, String mail, Date nacimiento) {
+        this.idPersona = idPersona;
         this.nombre = nombre;
         this.mail = mail;
         this.nacimiento = nacimiento;

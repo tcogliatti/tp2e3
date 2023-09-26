@@ -9,7 +9,6 @@ import java.util.List;
 @NamedQuery(name = Equipo.OBTENER_TODOS, query = "SELECT e FROM Equipo e")
 public class Equipo {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private int idEquipo;
     @ManyToOne
     private Persona dt;
@@ -23,12 +22,28 @@ public class Equipo {
     public Equipo() {
         this.equipo = new ArrayList<>();
     }
+
+    public Equipo(Persona dt, String nombre, String sponsor) {
+        this.dt = dt;
+        this.nombre = nombre;
+        this.sponsor = sponsor;
+    }
+
     public Equipo(Persona dt, List<Jugador> equipo, String sponsor, String nombre) {
         this.dt = dt;
         this.equipo = equipo;
         this.sponsor = sponsor;
         this.nombre = nombre;
     }
+
+    public Equipo(int idEquipo, Persona dt, String nombre, String sponsor) {
+        this.idEquipo = idEquipo;
+        this.dt = dt;
+        this.equipo = new ArrayList<>();
+        this.nombre = nombre;
+        this.sponsor = sponsor;
+    }
+
     public int getIdEquipo() {
         return idEquipo;
     }
@@ -59,5 +74,16 @@ public class Equipo {
     }
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    @Override
+    public String toString() {
+        return "Equipo{" +
+                "idEquipo=" + idEquipo +
+                ", nombre='" + nombre + '\'' +
+                ", sponsor='" + sponsor + '\'' +
+                ", dt=" + dt + '\'' +
+                ", equipo=" + equipo +
+                '}';
     }
 }

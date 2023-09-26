@@ -3,7 +3,7 @@
              xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 
-    <persistence-unit name="tp2e3_2">
+    <persistence-unit name="tp2e3_test">
 
         <class>dao.Persona</class>
         <class>dao.Jugador</class>
@@ -13,7 +13,7 @@
         <properties>
             <!--            propiedades de la configuracion de JDBC para MSQL-->
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
-            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/tp2e3_2" />
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/tp2e3_test" />
             <property name="javax.persistence.jdbc.user" value="root" />
             <property name="javax.persistence.jdbc.password" value="" />
 
