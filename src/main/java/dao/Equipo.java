@@ -7,6 +7,7 @@ import java.util.List;
 
 @Entity
 @DiscriminatorValue("jugador")
+@NamedQuery(name = Equipo.OBTENER_TODOS, query = "SELECT e FROM Equipo e")
 public class Equipo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,10 +20,7 @@ public class Equipo {
     private String nombre;
     @Column(nullable = true)
     private String sponsor;
-
-    public static final int MAXIMO_JUGADORES = 10;
-    public static final int MINIMO_JUGADORES = 7;
-
+    public static final String OBTENER_TODOS = "Equipo.ObtenerTodos";
     public Equipo() {
         this.equipo = new ArrayList<>();
     }

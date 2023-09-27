@@ -1,3 +1,4 @@
+import dao.Equipo;
 import dao.Persona;
 
 import javax.persistence.EntityManager;
@@ -18,5 +19,10 @@ public class Select {
         Query personaQuery = em.createNamedQuery(Persona.OBTENER_TODOS);
         List<Persona> personaList = personaQuery.getResultList();
         return new ArrayList<>(personaList);
+    }
+    public  static  ArrayList<Equipo> obtenerTodasLosEquipos(){
+        Query equipoQuery = em.createNamedQuery(Equipo.OBTENER_TODOS);
+        List<Persona> equipoList = equipoQuery.getResultList();
+        return new ArrayList<>(personequipoListaList);
     }
 }

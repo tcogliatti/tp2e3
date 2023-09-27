@@ -22,7 +22,7 @@ public class InsertExistingData {
     private static final String EQUIPOS_FILE = "equipos.csv";
     private static final String TORNEO_EQUIPO_FILE = "torneo_equipo.csv";
     private static final String JUGADOR_FILE = "jugador.csv";
-    protected final static String PERSISTENCE = "tp2e3_test";
+    protected final static String PERSISTENCE = "tp2e3";
     protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE);
     protected static EntityManager em = emf.createEntityManager();
 
