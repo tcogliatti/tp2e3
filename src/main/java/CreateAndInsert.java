@@ -15,7 +15,7 @@ public class CreateAndInsert {
     private static final String PERSONAS_FILE = "personas.csv";
     private static final String TORNEOS_FILE = "torneos.csv";
     private static final String EQUIPOS_FILE = "equipos.csv";
-    private static final String POSICIONES_FILE = "posiciones.csv";
+//    private static final String POSICIONES_FILE = "posiciones.csv";
     private static final int CANTIDAD_DE_EQUIPOS = 10;
     private static final int ANIO_INICIAL = 1982;
     private static final int ANIO_FINAL = 2005;
@@ -30,8 +30,8 @@ public class CreateAndInsert {
         em.getTransaction().begin();
 
         // carga de Personas
-        cargarPersonas();
-
+//        cargarPersonas();
+//
 //        // carga de posiciones
 //        cargaDePosiciones();
 //
@@ -77,23 +77,23 @@ public class CreateAndInsert {
         Calendar fechaAleatoria = new GregorianCalendar(anioAleatorio, mesAleatorio, diaAleatorio);
         return fechaAleatoria.getTime();
     }
-    ///////////////////////////////////////////////////////////     CARGA EQUIPOS
-    public static void cargaDePosiciones(){
-        Posicion pos = null;
-        CSVParser parser = null;
-        try {
-            parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + POSICIONES_FILE));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Cargando Posiciones --> ");
-        for (CSVRecord row : parser) {
-            pos = new Posicion(Integer.parseInt(row.get("nombre")), row.get("posicion"));
-            System.out.println("\t"+pos);
-            em.persist(pos);
-        }
-        System.out.println("\t\t\t--> proceso terminado /_");
-    }
+    ///////////////////////////////////////////////////////////     CARGA POSICIONES
+//    public static void cargaDePosiciones(){
+//        Posicion pos = null;
+//        CSVParser parser = null;
+//        try {
+//            parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + POSICIONES_FILE));
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println("Cargando Posiciones --> ");
+//        for (CSVRecord row : parser) {
+//            pos = new Posicion(Integer.parseInt(row.get("idPosicion")), row.get("posicion"));
+//            System.out.println("\t"+pos);
+//            em.persist(pos);
+//        }
+//        System.out.println("\t\t\t--> proceso terminado /_");
+//    }
 
     ///////////////////////////////////////////////////////////     CARGA EQUIPOS
     public static void cargaDeEquipos() {
@@ -102,11 +102,6 @@ public class CreateAndInsert {
         Jugador j;
         Equipo e;
         Persona p;
-        Map<Integer, String> posiciones = new HashMap<>();
-        posiciones.put(1, "arquero");
-        posiciones.put(2, "defensa");
-        posiciones.put(3, "medicampo");
-        posiciones.put(4, "delantera");
 
         for (int i = 0; i < CANTIDAD_DE_EQUIPOS; i++) {
             // nuevo equipo
@@ -132,7 +127,7 @@ public class CreateAndInsert {
             // arquero
             p = getPersonaRandom(personas);
             j = new Jugador(p);
-            j.setPosicion("arquero");
+            j.setPosicion(em.find(Posicion.class, 1));
             j.setEquipo(e);
             em.merge(j);
             // defensa
@@ -140,7 +135,7 @@ public class CreateAndInsert {
             for (int k = 0; k < cantDefensa; k++) {
                 p = getPersonaRandom(personas);
                 j = new Jugador(p);
-                j.setPosicion(posiciones.get(2));
+                j.setPosicion(em.find(Posicion.class, 2));
                 j.setEquipo(e);
                 em.merge(j);
             }
@@ -149,7 +144,7 @@ public class CreateAndInsert {
             for (int k = 0; k < cantMedioca; k++) {
                 p = getPersonaRandom(personas);
                 j = new Jugador(p);
-                j.setPosicion(posiciones.get(3));
+                j.setPosicion(em.find(Posicion.class, 3));
                 j.setEquipo(e);
                 em.merge(j);
             }
@@ -158,7 +153,7 @@ public class CreateAndInsert {
             for (int k = 0; k < cantDelante; k++) {
                 p = getPersonaRandom(personas);
                 j = new Jugador(p);
-                j.setPosicion(posiciones.get(4));
+                j.setPosicion(em.find(Posicion.class, 4));
                 j.setEquipo(e);
                 em.merge(j);
             }
@@ -167,7 +162,7 @@ public class CreateAndInsert {
             for (int k = 0; k < cantSuplent; k++) {
                 p = getPersonaRandom(personas);
                 j = new Jugador(p);
-                j.setPosicion(posiciones.get(getRandomEntreDosValores(1, 4)));
+                j.setPosicion(em.find(Posicion.class, getRandomEntreDosValores(1, 4)));
                 j.setEquipo(e);
                 em.merge(j);
             }

@@ -22,7 +22,7 @@ public class Select {
     }
     public  static  ArrayList<Equipo> obtenerTodasLosEquipos(){
         Query equipoQuery = em.createNamedQuery(Equipo.OBTENER_TODOS);
-        List<Persona> equipoList = equipoQuery.getResultList();
-        return new ArrayList<>(personequipoListaList);
+        List<Equipo> equipoList = equipoQuery.getResultList();
+        return new ArrayList<>(equipoList);
     }
 }

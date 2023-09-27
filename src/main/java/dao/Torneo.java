@@ -1,12 +1,12 @@
 package dao;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 public class Torneo {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private int idTorneo;
     @Column(nullable = false)
     private String nombre;
@@ -16,14 +16,25 @@ public class Torneo {
     private List<Equipo> equipos;
 
     public Torneo() {
+        this.cupo = 0;
+        this.equipos = new ArrayList<>();
     }
-
+    public Torneo(String nombre, int cupo) {
+        this.nombre = nombre;
+        this.cupo = cupo;
+        this.equipos = new ArrayList<>();
+    }
     public Torneo(String nombre, int cupo, List<Equipo> equipos) {
         this.nombre = nombre;
         this.cupo = cupo;
         this.equipos = equipos;
     }
-
+    public Torneo(int idTorneo, String nombre, int cupo) {
+        this.idTorneo = idTorneo;
+        this.nombre = nombre;
+        this.cupo = cupo;
+        this.equipos = new ArrayList<>();
+    }
     public int getIdTorneo() {
         return idTorneo;
     }
@@ -54,5 +65,19 @@ public class Torneo {
 
     public void setEquipos(List<Equipo> equipos) {
         this.equipos = equipos;
+    }
+    public void addEquipo(Equipo e){
+        if(this.cupo > this.equipos.size())
+            equipos.add(e);
+    }
+
+    @Override
+    public String toString() {
+        return "Torneo{" +
+                "idTorneo=" + idTorneo +
+                ", nombre='" + nombre + '\'' +
+                ", cupo=" + cupo + '\'' +
+                ", equipos=" + equipos +
+                '}';
     }
 }

@@ -1,6 +1,7 @@
 import dao.Equipo;
 import dao.Jugador;
 import dao.Persona;
+import dao.Posicion;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -108,31 +109,31 @@ public class Insert {
                 j =  new Jugador();
                 // set equipo
                 if (e.getEquipo().size() == 0) {
-                    j.setPosicion("arquero");
+                    j.setPosicion(em.find(Posicion.class, 1));
                     e.addJugador(j);
                     em.persist(j);
                 } else {
                     int cantDefensa = getRandomEntreDosValores(1, 4);
                     for (int k = 0; k < cantDefensa; k++) {
-                        j.setPosicion(posiciones.get(2));
+                        j.setPosicion(em.find(Posicion.class, 2));
                         e.addJugador(j);
                         em.persist(j);
                     }
                     int cantMedioca = getRandomEntreDosValores(1, (6 - cantDefensa - 1));
                     for (int k = 0; k < cantMedioca; k++) {
-                        j.setPosicion(posiciones.get(3));
+                        j.setPosicion(em.find(Posicion.class, 3));
                         e.addJugador(j);
                         em.persist(j);
                     }
                     int cantDelante = 6 - cantDefensa - cantMedioca;
                     for (int k = 0; k < cantDelante; k++) {
-                        j.setPosicion(posiciones.get(4));
+                        j.setPosicion(em.find(Posicion.class, 4));
                         e.addJugador(j);
                         em.persist(j);
                     }
                     int cantSuplent = getRandomEntreDosValores(0, 3);
                     for (int k = 0; k < cantSuplent; k++) {
-                        j.setPosicion(posiciones.get(getRandomEntreDosValores(1, 4)));
+                        j.setPosicion(em.find(Posicion.class, getRandomEntreDosValores(1, 4)));
                         e.addJugador(j);
                         em.persist(j);
                     }

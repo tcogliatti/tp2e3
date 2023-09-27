@@ -1,7 +1,4 @@
-import dao.Equipo;
-import dao.Jugador;
-import dao.Persona;
-import dao.Torneo;
+import dao.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -21,6 +18,7 @@ public class InsertExistingData {
     private static final String TORNEOS_FILE = "torneos.csv";
     private static final String EQUIPOS_FILE = "equipos.csv";
     private static final String TORNEO_EQUIPO_FILE = "torneo_equipo.csv";
+    private static final String POSICIONES_FILE = "posiciones.csv";
     private static final String JUGADOR_FILE = "jugador.csv";
     protected final static String PERSISTENCE = "tp2e3";
     protected static EntityManagerFactory emf = Persistence.createEntityManagerFactory(PERSISTENCE);
@@ -28,24 +26,27 @@ public class InsertExistingData {
 
     public static void main(String[] args) { ///////////////////////     MAIN      /////////////////////
 
-        try {
-            // coneccion
-            em.getTransaction().begin();
-
-            // carga de Personas
-            cargarPersonas();
-
-            // carga de equipos
-            cargaDeEquipos();
-
-            // ejecutar transacción
-            em.getTransaction().commit();
-
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            e.printStackTrace();
-            return;
-        }
+//        try {
+//            // coneccion
+//            em.getTransaction().begin();
+//
+//            // carga de Personas
+//            cargarPersonas();
+//
+//            // carga de equipos
+//            cargaDeEquipos();
+//
+//            // carga de posiciones
+//            cargaDePosiciones();
+//
+//            // ejecutar transacción
+//            em.getTransaction().commit();
+//
+//        } catch (Exception e) {
+//            em.getTransaction().rollback();
+//            e.printStackTrace();
+//            return;
+//        }
 
         try {
             // coneccion
@@ -55,7 +56,7 @@ public class InsertExistingData {
             cargaDeJugadores();
 
             // carga de Torneos
-            cargaDeTorneos();
+//            cargaDeTorneos();
 
             // ejecutar transacción
             em.getTransaction().commit();
@@ -65,26 +66,26 @@ public class InsertExistingData {
             e.printStackTrace();
             return;
         }
-
-        try {
-            // coneccion
-            em.getTransaction().begin();
-
-            // carga de equipos a torneos
-            cargaDeEquiposAtorneos();
-
-            // ejecutar transacción
-            em.getTransaction().commit();
-
-        } catch (Exception e) {
-            em.getTransaction().rollback();
-            e.printStackTrace();
-            return;
-        } finally {
-            // cierre
-            em.close();
-            emf.close();
-        }
+//
+//        try {
+//            // coneccion
+//            em.getTransaction().begin();
+//
+//            // carga de equipos a torneos
+//            cargaDeEquiposAtorneos();
+//
+//            // ejecutar transacción
+//            em.getTransaction().commit();
+//
+//        } catch (Exception e) {
+//            em.getTransaction().rollback();
+//            e.printStackTrace();
+//            return;
+//        } finally {
+//            // cierre
+//            em.close();
+//            emf.close();
+//        }
     }
 
     ///////////////////////////////////////////////////////////     CARGA PERSONAS
@@ -109,7 +110,7 @@ public class InsertExistingData {
             }
 //            Date nacimiento = new Date(row.get("nacimiento"));
             per = new Persona(Integer.parseInt(row.get("idPersona")), row.get("nombre"), row.get("mail"), nacimiento);
-            System.out.println("\t"+per);
+            System.out.println("\t" + per);
             em.persist(per);
         }
         System.out.println("\n                  --> proceso terminado /_");
@@ -119,6 +120,7 @@ public class InsertExistingData {
     public static void cargaDeEquipos() {
         Equipo equipo;
         Persona persona;
+        Jugador jugador;
         CSVParser parser;
 
         // carga CSV
@@ -131,11 +133,33 @@ public class InsertExistingData {
         System.out.println("Cargando Equipos --> ");
         for (CSVRecord row : parser) {
             persona = em.find(Persona.class, Integer.parseInt(row.get("dt_idPersona")));
-            equipo = new Equipo(Integer.parseInt(row.get("idEquipo")), persona, row.get("nombre"), row.get("sponsor"));
-            System.out.println("\t"+equipo);
+            String sponsor = row.get("sponsor");
+            if (sponsor == "")
+                sponsor = null;
+
+            equipo = new Equipo(Integer.parseInt(row.get("idEquipo")), persona, row.get("nombre"), sponsor);
+            System.out.println("\t" + equipo);
             em.persist(equipo);
         }
         System.out.println("\n                  --> proceso terminado /_");
+    }
+
+    ///////////////////////////////////////////////////////////     CARGA POSICIONES
+    public static void cargaDePosiciones() {
+        Posicion pos = null;
+        CSVParser parser = null;
+        try {
+            parser = CSVFormat.DEFAULT.withHeader().parse(new FileReader(path + POSICIONES_FILE));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Cargando Posiciones --> ");
+        for (CSVRecord row : parser) {
+            pos = new Posicion(Integer.parseInt(row.get("idPosicion")), row.get("posicion"));
+            System.out.println("\t" + pos);
+            em.persist(pos);
+        }
+        System.out.println("\t\t\t--> proceso terminado /_");
     }
 
     ///////////////////////////////////////////////////////////     CARGA JUGADORES
@@ -143,6 +167,7 @@ public class InsertExistingData {
         Equipo equipo;
         Persona persona;
         Jugador jugador;
+        Posicion posicion;
         CSVParser parser;
 
         // carga CSV
@@ -154,18 +179,22 @@ public class InsertExistingData {
 
         System.out.println("Cargando Jugadores --> ");
         for (CSVRecord row : parser) {
+
             persona = em.find(Persona.class, Integer.parseInt(row.get("persona_idPersona")));
             equipo = em.find(Equipo.class, Integer.parseInt(row.get("equipo_idEquipo")));
-            jugador = new Jugador(persona, row.get("posicion"), equipo);
-            System.out.println("\t"+jugador);
-            em.persist(jugador);
+            posicion = em.find(Posicion.class, Integer.parseInt(row.get("posicion")));
+            jugador = new Jugador(persona);
+            jugador.setPosicion(posicion);
+            jugador.setEquipo(equipo);
+            System.out.println("\t" + jugador);
+            em.merge(jugador);
         }
         System.out.println("\n                  --> proceso terminado /_");
     }
 
     ///////////////////////////////////////////////////////////     CARGA TORNEOS
 
-    public static void cargaDeTorneos(){
+    public static void cargaDeTorneos() {
         Torneo torneo;
         CSVParser parser;
 
@@ -179,14 +208,14 @@ public class InsertExistingData {
         System.out.println("Cargando Torneos --> ");
         for (CSVRecord row : parser) {
             torneo = new Torneo(Integer.parseInt(row.get("idTorneo")), row.get("nombre"), Integer.parseInt(row.get("cupo")));
-            System.out.println("\t"+torneo);
+            System.out.println("\t" + torneo);
             em.persist(torneo);
         }
         System.out.println("\n                  --> proceso terminado /_");
     }
 
     ///////////////////////////////////////////////////////////     CARGA EQUIPOS A TORNEOS
-    public static void cargaDeEquiposAtorneos(){
+    public static void cargaDeEquiposAtorneos() {
         Torneo torneo = new Torneo();
         Equipo equipo;
         CSVParser parser;
@@ -203,7 +232,7 @@ public class InsertExistingData {
         Integer prevIdTorneo = null;
         for (CSVRecord row : parser) {
             idTorneo = Integer.parseInt(row.get("Torneo_idTorneo"));
-            if(!idTorneo.equals(prevIdTorneo) || idTorneo.equals(null)){
+            if (!idTorneo.equals(prevIdTorneo) || idTorneo.equals(null)) {
                 torneo = em.find(Torneo.class, idTorneo);
                 prevIdTorneo = idTorneo;
             }

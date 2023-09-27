@@ -1,38 +1,40 @@
 package dao;
 
 import javax.persistence.*;
-import java.util.Date;
+import javax.sql.ConnectionPoolDataSource;
 
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING)
-public class Jugador extends Persona {
-    private String posicion;
+@NamedQuery(name = Jugador.OBTENER_TODOS, query = "select j from Jugador j")
+@DiscriminatorValue("jugador")
+public class Jugador extends Persona{
+    @OneToOne
+    private Posicion posicion;
     @ManyToOne
     private Equipo equipo;
+    public static final String OBTENER_TODOS = "Jugador.obtenerTodos";
+
     public Jugador() {
-
     }
-    public Jugador(Persona p){
-        super(p.getNombre(), p.getMail(), p.getNacimiento());
-        posicion = null;
-        equipo = null;
-    }
-    public Jugador(String posicion, Equipo equipo) {
-        this.posicion = posicion;
-        this.equipo = equipo;
+    public Jugador(Persona per) {
+        this.setIdPersona(per.getIdPersona());
+        this.setNombre(per.getNombre());
+        this.setMail(per.getMail());
+        this.setNacimiento(per.getNacimiento());
     }
 
-    public Jugador(String nombre, String mail, Date nacimiento, String posicion, Equipo equipo) {
-        super(nombre, mail, nacimiento);
-        this.posicion = posicion;
-        this.equipo = equipo;
+    public Jugador(Persona per, Posicion pos, Equipo equi) {
+        this.setIdPersona(per.getIdPersona());
+        this.setNombre(per.getNombre());
+        this.setMail(per.getMail());
+        this.setNacimiento(per.getNacimiento());
+        this.posicion = pos;
+        this.equipo = equi;
     }
-    public String getPosicion() {
+    public Posicion getPosicion() {
         return posicion;
     }
 
-    public void setPosicion(String posicion) {
+    public void setPosicion(Posicion posicion) {
         this.posicion = posicion;
     }
 
@@ -47,10 +49,7 @@ public class Jugador extends Persona {
     @Override
     public String toString() {
         return "Jugador{" +
-                "idPersona=" + idPersona +
-                ", nombre='" + nombre + '\'' +
-                ", mail='" + mail + '\'' +
-                ", nacimiento=" + nacimiento +
+                super.toString() +
                 "posicion='" + posicion + '\'' +
                 ", equipo=" + equipo +
                 '}';

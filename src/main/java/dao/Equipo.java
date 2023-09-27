@@ -6,11 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@DiscriminatorValue("jugador")
 @NamedQuery(name = Equipo.OBTENER_TODOS, query = "SELECT e FROM Equipo e")
 public class Equipo {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private int idEquipo;
     @ManyToOne
     private Persona dt;
@@ -20,16 +18,34 @@ public class Equipo {
     private String nombre;
     @Column(nullable = true)
     private String sponsor;
-    public static final String OBTENER_TODOS = "Equipo.ObtenerTodos";
+    public static final String OBTENER_TODOS = "Equipos.obtenerTodos";
+    public static final int MINIMO_JUGADORES = 7;
+    public static final int MAXIMO_JUGADORES = 10;
     public Equipo() {
         this.equipo = new ArrayList<>();
     }
+
+    public Equipo(Persona dt, String nombre, String sponsor) {
+        this.dt = dt;
+        this.nombre = nombre;
+        this.sponsor = sponsor;
+    }
+
     public Equipo(Persona dt, List<Jugador> equipo, String sponsor, String nombre) {
         this.dt = dt;
         this.equipo = equipo;
         this.sponsor = sponsor;
         this.nombre = nombre;
     }
+
+    public Equipo(int idEquipo, Persona dt, String nombre, String sponsor) {
+        this.idEquipo = idEquipo;
+        this.dt = dt;
+        this.equipo = new ArrayList<>();
+        this.nombre = nombre;
+        this.sponsor = sponsor;
+    }
+
     public int getIdEquipo() {
         return idEquipo;
     }
@@ -60,5 +76,16 @@ public class Equipo {
     }
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    @Override
+    public String toString() {
+        return "Equipo{" +
+                "idEquipo=" + idEquipo +
+                ", nombre='" + nombre + '\'' +
+                ", sponsor='" + sponsor + '\'' +
+                ", dt=" + dt + '\'' +
+                ", equipo=" + equipo +
+                '}';
     }
 }
