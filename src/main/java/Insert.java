@@ -30,10 +30,11 @@ public class Insert {
         em.getTransaction().begin();
 
         // carga de Personas
-//        cargarPersonas();
+        cargarPersonas();
 
         // carga de equipos
         cargaDeEquipos();
+
         // enviando la transacción
         em.getTransaction().commit();
 
@@ -64,10 +65,10 @@ public class Insert {
 
     public static Date obtenerNacimientoAleatoreo() {
         Random random = new Random();
-        int añoAleatorio = random.nextInt(ANIO_FINAL - ANIO_INICIAL + 1) + ANIO_INICIAL;
+        int anioAleatorio = random.nextInt(ANIO_FINAL - ANIO_INICIAL + 1) + ANIO_INICIAL;
         int mesAleatorio = random.nextInt(12);
         int diaAleatorio = random.nextInt(28) + 1;
-        Calendar fechaAleatoria = new GregorianCalendar(añoAleatorio, mesAleatorio, diaAleatorio);
+        Calendar fechaAleatoria = new GregorianCalendar(anioAleatorio, mesAleatorio, diaAleatorio);
         return fechaAleatoria.getTime();
     }
 

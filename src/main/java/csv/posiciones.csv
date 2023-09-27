@@ -1,5 +1,5 @@
-posicion
-arquero
-defensa
-mediocampo
-delantera
+idPosicion, posicion
+1,arquero
+2,defensa
+3,medicampo
+4,delantero

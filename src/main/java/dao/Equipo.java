@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@DiscriminatorValue("jugador")
 public class Equipo {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

@@ -5,11 +5,11 @@ import java.util.Date;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "tipo_jugador")
+@DiscriminatorColumn(name = "tipo", discriminatorType = DiscriminatorType.STRING)
 @NamedQuery(name = Persona.OBTENER_TODOS, query = "select p from Persona p")
 public class Persona {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected int idPersona;
     @Column(nullable = false)
     protected String nombre;

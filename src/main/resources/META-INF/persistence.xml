@@ -7,6 +7,7 @@
 
         <class>dao.Persona</class>
         <class>dao.Jugador</class>
+        <class>dao.DirectorTecnico</class>
         <class>dao.Torneo</class>
         <class>dao.Equipo</class>
 
